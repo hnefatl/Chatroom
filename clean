@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ $# -ne 1 ]; then
+	rm -fr "builds"
+	mkdir builds
+	rm -f Chatroom.7z
+else
+	rm -fr "builds/$1"
+fi

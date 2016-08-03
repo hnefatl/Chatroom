@@ -1,0 +1,2 @@
+#!/bin/bash
+echo | mutt -s Chatroom -a Chatroom.7z -- hnefatl@gmail.com
