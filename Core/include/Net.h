@@ -4,8 +4,8 @@
 #include "Core.h"
 #include "Log.h"
 
-CORE_API bool NetInit();
-CORE_API void NetShutdown();
+#include <vector>
+#include <string>
 
 #ifdef _WIN32
 
@@ -14,38 +14,41 @@ CORE_API void NetShutdown();
 #include <WS2tcpip.h>
 #include <WinSock2.h>
 
-bool NetInit()
-{
-	WSAData Version;
-	int Result = WSAStartup(MAKEWORD(2, 0), &Version);
-	if (Result != 0)
-	{
-        LogWriteError("Failed to start WSA, code " + Result);
-		return false;
-	}
-
-	LogWrite("WSA started");
-}
-void NetShutdown()
-{
-	WSACleanup();
-	LogWrite("WSA stopped");
-}
-
-#else defined(__linux__)
+#elif defined(__linux__)
 
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
 
-bool NetInit()
-{
-    return true;
-}
-void NetShutdown()
-{
-}
-
 #endif
+
+CORE_API bool NetInit();
+CORE_API void NetShutdown();
+
+CORE_API uint32_t HtoN(const uint32_t i);
+CORE_API int32_t HtoN(const int32_t i);
+
+CORE_API uint32_t NtoH(const uint32_t i);
+CORE_API int32_t NtoH(const int32_t i);
+
+
+CORE_API std::vector<unsigned char> GetBytes(const uint32_t Value);
+CORE_API void GetBytes(const uint32_t Value, std::vector<unsigned char> &Buffer);
+
+CORE_API std::vector<unsigned char> GetBytes(const int32_t Value);
+CORE_API void GetBytes(const int32_t Value, std::vector<unsigned char> &Buffer);
+
+CORE_API std::vector<unsigned char> GetBytes(const std::string &Value);
+CORE_API void GetBytes(const std::string &Value, std::vector<unsigned char> &Buffer);
+
+
+CORE_API uint32_t GetUInt32(const std::vector<unsigned char> &Buffer);
+CORE_API uint32_t GetUInt32(const std::vector<unsigned char> &Buffer, std::size_t &Start);
+
+CORE_API int32_t GetInt32(const std::vector<unsigned char> &Buffer);
+CORE_API int32_t GetInt32(const std::vector<unsigned char> &Buffer, std::size_t &Start);
+
+CORE_API std::string GetString(const std::vector<unsigned char> &Buffer);
+CORE_API std::string GetString(const std::vector<unsigned char> &Buffer, std::size_t &Start);
 
 #endif
