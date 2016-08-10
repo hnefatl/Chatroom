@@ -15,8 +15,8 @@ protected:
 public:
     User();
 
-    void Serialise(std::vector<unsigned char> &Buffer) const;
-    std::size_t Deserialise(const std::vector<unsigned char> &Buffer, const std::size_t Start);
+    void Encode(std::vector<unsigned char> &Buffer) const;
+    bool Decode(const std::vector<unsigned char> &Buffer, std::size_t &Start);
 
 };
 

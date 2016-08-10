@@ -50,51 +50,92 @@ int32_t NtoH(const int32_t i)
     return (int32_t)NtoH((uint32_t)i);
 }
 
-std::vector<unsigned char> GetBytes(const uint32_t Value)
+std::vector<unsigned char> Serialise(const uint32_t Value)
 {
     std::vector<unsigned char> Buffer;
-    GetBytes(Value, Buffer);
+    Serialise(Value, Buffer);
     return Buffer;
 }
-void GetBytes(const uint32_t Value, std::vector<unsigned char> &Buffer)
+void Serialise(const uint32_t Value, std::vector<unsigned char> &Buffer)
 {
-    Buffer.reserve(Buffer.size() + sizeof(Value));
-    Buffer.push_back(Value & 0xFF);
-    Buffer.push_back(Value & 0xFF00);
-    Buffer.push_back(Value & 0xFF0000);
-    Buffer.push_back(Value & 0xFF000000);
+    Buffer.push_back(Value);
+    Buffer.push_back(Value >> 8);
+    Buffer.push_back(Value >> 16);
+    Buffer.push_back(Value >> 24);
 }
 
-std::vector<unsigned char> GetBytes(const int32_t Value)
-{
-    return GetBytes((uint32_t)Value);
-}
-void GetBytes(const int32_t Value, std::vector<unsigned char> &Buffer)
-{
-    GetBytes((uint32_t)Value, Buffer);
-}
-
-std::vector<unsigned char> GetBytes(const std::string &Value)
+std::vector<unsigned char> Serialise(const int32_t Value)
 {
     std::vector<unsigned char> Buffer;
-    GetBytes(Value, Buffer);
+    Serialise(Value, Buffer);
     return Buffer;
 }
-void GetBytes(const std::string &Value, std::vector<unsigned char> &Buffer)
+void Serialise(const int32_t Value, std::vector<unsigned char> &Buffer)
 {
-    GetBytes((uint32_t)Value.size(), Buffer);
+    Buffer.push_back(Value);
+    Buffer.push_back(Value >> 8);
+    Buffer.push_back(Value >> 16);
+    Buffer.push_back(Value >> 24);
+}
+
+std::vector<unsigned char> Serialise(const std::string &Value)
+{
+    std::vector<unsigned char> Buffer;
+    Serialise(Value, Buffer);
+    return Buffer;
+}
+void Serialise(const std::string &Value, std::vector<unsigned char> &Buffer)
+{
+    Serialise((uint32_t)Value.size(), Buffer);
     Buffer.insert(Buffer.end(), Value.begin(), Value.end());
 }
 
 
-uint32_t GetUInt32(const std::vector<unsigned char> &Buffer)
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, uint32_t &Out)
 {
-
+    std::size_t Start = 0;
+    return Deserialise(Buffer, Start, Out);
 }
-uint32_t GetUInt32(const std::vector<unsigned char> &Buffer, std::size_t &Start);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, uint32_t &Out)
+{
+    if (Buffer.size() - Start < 4)
+        return false;
 
-int32_t GetInt32(const std::vector<unsigned char> &Buffer);
-int32_t GetInt32(const std::vector<unsigned char> &Buffer, std::size_t &Start);
+    Out |= (Buffer[Start] << 0) | (Buffer[Start + 1] << 8) | (Buffer[Start + 2] << 16) | (Buffer[Start + 3] << 24);
+    Start += 4;
+    return true;
+}
 
-std::string GetString(const std::vector<unsigned char> &Buffer);
-std::string GetString(const std::vector<unsigned char> &Buffer, std::size_t &Start);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, int32_t &Out)
+{
+    std::size_t Start = 0;
+    return Deserialise(Buffer, Start, Out);
+}
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, int32_t &Out)
+{
+    if (Buffer.size() - Start < 4)
+        return false;
+
+    Out |= (Buffer[Start] << 0) | (Buffer[Start + 1] << 8) | (Buffer[Start + 2] << 16) | (Buffer[Start + 3] << 24);
+    Start += 4;
+    return true;
+}
+
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::string &Out)
+{
+    std::size_t Start = 0;
+    return Deserialise(Buffer, Start, Out);
+}
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, std::string &Out)
+{
+    uint32_t Length;
+    if (!Deserialise(Buffer, Start, Length))
+        return false;
+
+    if (Buffer.size() - Start < Length)
+        return false;
+
+    Out = std::string(Buffer.begin() + Start, Buffer.begin() + Start + Length);
+    Start += Length;
+    return true;
+}

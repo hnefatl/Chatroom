@@ -32,23 +32,23 @@ CORE_API uint32_t NtoH(const uint32_t i);
 CORE_API int32_t NtoH(const int32_t i);
 
 
-CORE_API std::vector<unsigned char> GetBytes(const uint32_t Value);
-CORE_API void GetBytes(const uint32_t Value, std::vector<unsigned char> &Buffer);
+CORE_API std::vector<unsigned char> Serialise(const uint32_t Value);
+CORE_API void Serialise(const uint32_t Value, std::vector<unsigned char> &Buffer);
 
-CORE_API std::vector<unsigned char> GetBytes(const int32_t Value);
-CORE_API void GetBytes(const int32_t Value, std::vector<unsigned char> &Buffer);
+CORE_API std::vector<unsigned char> Serialise(const int32_t Value);
+CORE_API void Serialise(const int32_t Value, std::vector<unsigned char> &Buffer);
 
-CORE_API std::vector<unsigned char> GetBytes(const std::string &Value);
-CORE_API void GetBytes(const std::string &Value, std::vector<unsigned char> &Buffer);
+CORE_API std::vector<unsigned char> Serialise(const std::string &Value);
+CORE_API void Serialise(const std::string &Value, std::vector<unsigned char> &Buffer);
 
 
-CORE_API uint32_t GetUInt32(const std::vector<unsigned char> &Buffer);
-CORE_API uint32_t GetUInt32(const std::vector<unsigned char> &Buffer, std::size_t &Start);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, uint32_t &Out);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, uint32_t &Out);
 
-CORE_API int32_t GetInt32(const std::vector<unsigned char> &Buffer);
-CORE_API int32_t GetInt32(const std::vector<unsigned char> &Buffer, std::size_t &Start);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, int32_t &Out);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, int32_t &Out);
 
-CORE_API std::string GetString(const std::vector<unsigned char> &Buffer);
-CORE_API std::string GetString(const std::vector<unsigned char> &Buffer, std::size_t &Start);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::string &Out);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, std::string &Out);
 
 #endif

@@ -1,13 +1,14 @@
 #include "Encodable.h"
 
-std::vector<unsigned char> Encodable::Serialise() const
+std::vector<unsigned char> Encodable::Encode() const
 {
     std::vector<unsigned char> Buffer;
-    Serialise(Buffer);
+    Encode(Buffer);
     return Buffer;
 }
 
-void Encodable::Deserialise(const std::vector<unsigned char> &Buffer)
+bool Encodable::Decode(const std::vector<unsigned char> &Buffer)
 {
-    Deserialise(Buffer, 0);
+    std::size_t Start = 0;
+    return Decode(Buffer, Start);
 }

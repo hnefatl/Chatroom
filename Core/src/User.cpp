@@ -1,16 +1,23 @@
 #include "User.h"
 
+#include "Net.h"
+
 User::User()
 {
 
 }
 
-void User::Serialise(std::vector<unsigned char> &Buffer) const
+void User::Encode(std::vector<unsigned char> &Buffer) const
 {
-
-
+    Serialise(Id, Buffer);
+    Serialise(Username);
 }
-std::size_t User::Deserialise(const std::vector<unsigned char> &Buffer, const std::size_t Start)
+bool User::Decode(const std::vector<unsigned char> &Buffer, std::size_t &Start)
 {
-    return 0;
+    if(!Deserialise(Buffer, Start, Id))
+        return false;
+    if(!Deserialise(Buffer, Start, Username))
+        return false;
+
+    return true;
 }

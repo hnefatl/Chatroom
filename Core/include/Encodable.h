@@ -8,11 +8,11 @@
 class CORE_API Encodable
 {
 public:
-    std::vector<unsigned char> Serialise() const;
-    virtual void Serialise(std::vector<unsigned char> &Buffer) const = 0;
+    std::vector<unsigned char> Encode() const;
+    virtual void Encode(std::vector<unsigned char> &Buffer) const = 0;
 
-    void Deserialise(const std::vector<unsigned char> &Buffer);
-    virtual std::size_t Deserialise(const std::vector<unsigned char> &Buffer, const std::size_t Start) = 0;
+    bool Decode(const std::vector<unsigned char> &Buffer);
+    virtual bool Decode(const std::vector<unsigned char> &Buffer, std::size_t &Start) = 0;
 };
 
 #endif
