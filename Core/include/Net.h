@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-#ifdef _WIN32
+#if defined(_WIN32)
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -19,6 +19,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+
+typedef int SOCKET;
 
 #endif
 
@@ -32,13 +34,12 @@ CORE_API uint32_t NtoH(const uint32_t i);
 CORE_API int32_t NtoH(const int32_t i);
 
 
-CORE_API std::vector<unsigned char> Serialise(const uint32_t Value);
 CORE_API void Serialise(const uint32_t Value, std::vector<unsigned char> &Buffer);
 
-CORE_API std::vector<unsigned char> Serialise(const int32_t Value);
 CORE_API void Serialise(const int32_t Value, std::vector<unsigned char> &Buffer);
 
-CORE_API std::vector<unsigned char> Serialise(const std::string &Value);
+CORE_API void Serialise(const bool Value, std::vector<unsigned char> &Buffer);
+
 CORE_API void Serialise(const std::string &Value, std::vector<unsigned char> &Buffer);
 
 
@@ -47,6 +48,9 @@ CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t 
 
 CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, int32_t &Out);
 CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, int32_t &Out);
+
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, bool &Out);
+CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, bool &Out);
 
 CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::string &Out);
 CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, std::string &Out);

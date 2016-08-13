@@ -9,14 +9,14 @@ class User
     : public Encodable
 {
 protected:
-    uint32_t Id;
     std::string Username;
+    std::string Password;
+
+    virtual void _Encode(std::vector<unsigned char> &Buffer, const bool Partial) const;
+    virtual bool _Decode(const std::vector<unsigned char> &Buffer, std::size_t &Start, const bool Partial);
 
 public:
     User();
-
-    void Encode(std::vector<unsigned char> &Buffer) const;
-    bool Decode(const std::vector<unsigned char> &Buffer, std::size_t &Start);
 
 };
 

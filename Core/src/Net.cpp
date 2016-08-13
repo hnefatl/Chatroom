@@ -50,12 +50,6 @@ int32_t NtoH(const int32_t i)
     return (int32_t)NtoH((uint32_t)i);
 }
 
-std::vector<unsigned char> Serialise(const uint32_t Value)
-{
-    std::vector<unsigned char> Buffer;
-    Serialise(Value, Buffer);
-    return Buffer;
-}
 void Serialise(const uint32_t Value, std::vector<unsigned char> &Buffer)
 {
     Buffer.push_back(Value);
@@ -64,12 +58,6 @@ void Serialise(const uint32_t Value, std::vector<unsigned char> &Buffer)
     Buffer.push_back(Value >> 24);
 }
 
-std::vector<unsigned char> Serialise(const int32_t Value)
-{
-    std::vector<unsigned char> Buffer;
-    Serialise(Value, Buffer);
-    return Buffer;
-}
 void Serialise(const int32_t Value, std::vector<unsigned char> &Buffer)
 {
     Buffer.push_back(Value);
@@ -78,12 +66,11 @@ void Serialise(const int32_t Value, std::vector<unsigned char> &Buffer)
     Buffer.push_back(Value >> 24);
 }
 
-std::vector<unsigned char> Serialise(const std::string &Value)
+void Serialise(const bool Value, std::vector<unsigned char> &Buffer)
 {
-    std::vector<unsigned char> Buffer;
-    Serialise(Value, Buffer);
-    return Buffer;
+    Buffer.push_back(Value ? 1 : 0);
 }
+
 void Serialise(const std::string &Value, std::vector<unsigned char> &Buffer)
 {
     Serialise((uint32_t)Value.size(), Buffer);
@@ -91,12 +78,12 @@ void Serialise(const std::string &Value, std::vector<unsigned char> &Buffer)
 }
 
 
-CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, uint32_t &Out)
+bool Deserialise(const std::vector<unsigned char> &Buffer, uint32_t &Out)
 {
     std::size_t Start = 0;
     return Deserialise(Buffer, Start, Out);
 }
-CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, uint32_t &Out)
+bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, uint32_t &Out)
 {
     if (Buffer.size() - Start < 4)
         return false;
@@ -106,12 +93,12 @@ CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t 
     return true;
 }
 
-CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, int32_t &Out)
+bool Deserialise(const std::vector<unsigned char> &Buffer, int32_t &Out)
 {
     std::size_t Start = 0;
     return Deserialise(Buffer, Start, Out);
 }
-CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, int32_t &Out)
+bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, int32_t &Out)
 {
     if (Buffer.size() - Start < 4)
         return false;
@@ -121,12 +108,27 @@ CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t 
     return true;
 }
 
-CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::string &Out)
+bool Deserialise(const std::vector<unsigned char> &Buffer, bool &Out)
 {
     std::size_t Start = 0;
     return Deserialise(Buffer, Start, Out);
 }
-CORE_API bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, std::string &Out)
+bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, bool &Out)
+{
+    if (Buffer.size() - Start < 1)
+        return false;
+
+    Out = Buffer[Start] != 0 ? true : false;
+    Start += 1;
+    return true;
+}
+
+bool Deserialise(const std::vector<unsigned char> &Buffer, std::string &Out)
+{
+    std::size_t Start = 0;
+    return Deserialise(Buffer, Start, Out);
+}
+bool Deserialise(const std::vector<unsigned char> &Buffer, std::size_t &Start, std::string &Out)
 {
     uint32_t Length;
     if (!Deserialise(Buffer, Start, Length))
