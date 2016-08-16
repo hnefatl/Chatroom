@@ -119,7 +119,7 @@ Key GetKey()
 	else if (Input == 27 && GetChar() != 91)
 	{
 		Input = GetChar();
-		if (Input == 51)
+		if (Input == 51 && GetChar() == 126)
 			return Key(SpecialKey::Delete);
 		else if (Input == 70)
 			return Key(SpecialKey::End);
@@ -137,5 +137,33 @@ Key GetKey()
 			return Key(SpecialKey::RightArrow);
 	}
 #endif
+
 	return Key();
 }
+/*
+ * Linux
+ * Backspace:	127
+ * Delete:		27  91  51  126
+ * Enter:		10
+ * Home:		27  91  72
+ * End:			27  91  70
+ * Tab:			8
+ * BackTab:		27  91  90
+ * UpArrow:		27  91  65
+ * DownArrow:	27  91  66
+ * LeftArrow:	27  91  68
+ * RightArrow:	27  91  67
+ *
+ * Windows
+ * Backspace:
+ * Delete:
+ * Enter:
+ * Home:
+ * End:
+ * Tab:
+ * BackTab:
+ * UpArrow:
+ * DownArrow:
+ * LeftArrow:
+ * RightArrow:
+*/

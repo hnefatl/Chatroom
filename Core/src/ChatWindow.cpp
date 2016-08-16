@@ -4,9 +4,10 @@
 
 #include "ConsoleIO.h"
 
-ChatWindow::ChatWindow()
+ChatWindow::ChatWindow(const std::function<void(const std::string &)> OnSend)
 {
 	StopFlag = false;
+	this->OnSend = OnSend;
 }
 
 void ChatWindow::Refresh()
@@ -93,9 +94,16 @@ void ChatWindow::InputFunc()
 				Input.erase(Input.begin() + CursorPosition);
 		}
 		else if (In.k == SpecialKey::Home)
+		{
 			CursorPosition = 0;
+		}
 		else if (In.k == SpecialKey::End)
-			CursorPosition = Input.size() - 1;
+		{
+			if(Input.size() > 0)
+				CursorPosition = Input.size() - 1;
+			else
+				CursorPosition = 0;
+		}
 		else if (In.k == SpecialKey::LeftArrow)
 		{
 			if (CursorPosition > 0)
@@ -105,6 +113,14 @@ void ChatWindow::InputFunc()
 		{
 			if (CursorPosition < Input.size() - 1)
 				CursorPosition++;
+		}
+		else if (In.k == SpecialKey::Enter)
+		{
+			if (Input.size() > 0)
+			{
+				OnSend(Input);
+				Input.clear();
+			}
 		}
 	}
 

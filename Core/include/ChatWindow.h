@@ -7,6 +7,7 @@
 #include <string>
 #include <thread>
 #include <condition_variable>
+#include <functional>
 
 class ChatWindow
 {
@@ -18,6 +19,8 @@ protected:
 	std::string Input;
 	unsigned int CursorPosition;
 	char CommandChar;
+
+	std::function<void(const std::string &)> OnSend;
 
 	std::mutex PrintLock;
 
@@ -35,7 +38,7 @@ protected:
 	void InputFunc();
 
 public:
-    ChatWindow();
+    ChatWindow(const std::function<void(const std::string &)> OnSend);
 
     void Start();
 	void Stop();
