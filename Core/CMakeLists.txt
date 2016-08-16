@@ -9,4 +9,6 @@ add_library(Core SHARED ${Core_Sources} ${Core_Headers})
 
 if(WIN32)
 	target_link_libraries(Core ws2_32)
+elseif(UNIX)
+	target_link_libraries(Core pthread)
 endif()
