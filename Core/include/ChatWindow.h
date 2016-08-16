@@ -8,29 +8,6 @@
 #include <thread>
 #include <condition_variable>
 
-#if defined(_WIN32)
-
-#include <windows.h>
-#include <conio.h>
-
-#elif defined(__linux__)
-
-#include <termios.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-
-#endif
-
-struct Dimensions
-{
-    unsigned int Width;
-    unsigned int Height;
-};
-Dimensions GetTerminalDimensions();
-void SetCursor(const unsigned int x, const unsigned int y);
-void ClearScreen();
-char GetChar();
-
 class ChatWindow
 {
 protected:
@@ -50,6 +27,9 @@ protected:
 	bool StopFlag;
 
     void Refresh();
+	void RefreshContent();
+	void RefreshInput();
+
     void Print(const std::string &Text);
 
 	void InputFunc();

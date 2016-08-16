@@ -2,89 +2,7 @@
 
 #include <algorithm>
 
-Dimensions GetTerminalDimensions()
-{
-#if defined(_WIN32)
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    Dimensions Result;
-
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    Result.Width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    Result.Height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-
-    return Result;
-
-#elif defined(__linux__)
-
-    winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    Dimensions Result;
-    Result.Height = w.ws_row;
-    Result.Width = w.ws_col;
-
-    return Result;
-#endif
-}
-
-void SetCursor(const unsigned int x, const unsigned int y)
-{
-#if defined(_WIN32)
-	COORD Coord;
-
-	Coord.X = x;
-	Coord.Y = y;
-
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Coord);
-#elif defined(__linux__)
-	printf("\033[%d;%dH", x+1, y+1);
-#endif
-}
-
-char GetChar()
-{
-#if defined(_WIN32)
-	return (char)_getch();
-#elif defined(__linux__)
-	termios Old, New;
-	char Input;
-	tcgetattr(STDIN_FILENO, &Old);
-	New = Old;
-	New.c_lflag &= ~(ICANON | ECHO);
-	tcsetattr(STDIN_FILENO, TCSANOW, &New);
-	Input = (char)getchar();
-	tcsetattr(STDIN_FILENO, TCSANOW, &Old);
-	return Input;
-#endif
-}
-
-void ClearScreen()
-{
-#if defined(_WIN32)
-	HANDLE hStdOut;
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	DWORD count;
-	COORD homeCoords = { 0, 0 };
-
-	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-	if (hStdOut == INVALID_HANDLE_VALUE)
-		return;
-
-	Dimensions d = GetTerminalDimensions();
-	DWORD Cells = d.Height * d.Width;
-
-	GetConsoleScreenBufferInfo(hStdOut, &csbi);
-
-	if (!FillConsoleOutputCharacter(hStdOut, (TCHAR)' ', Cells, homeCoords, &count))
-		return;
-
-	if (!FillConsoleOutputAttribute(hStdOut, csbi.wAttributes, Cells, homeCoords, &count))
-		return;
-#elif defined(__linux__)
-	// TODO: Find native efficient method - use ncurses?
-	system("clear");
-#endif
-}
-
+#include "ConsoleIO.h"
 
 ChatWindow::ChatWindow()
 {
@@ -92,6 +10,11 @@ ChatWindow::ChatWindow()
 }
 
 void ChatWindow::Refresh()
+{
+	RefreshContent();
+	RefreshInput();
+}
+void ChatWindow::RefreshContent()
 {
 	Dimensions d = GetTerminalDimensions();
 
@@ -130,6 +53,12 @@ void ChatWindow::Refresh()
 
 	PrintLock.unlock();
 }
+void ChatWindow::RefreshInput()
+{
+
+}
+
+
 void ChatWindow::Print(const std::string &Text)
 {
 	Content.push_back(Text);
@@ -143,26 +72,39 @@ void ChatWindow::InputFunc()
 {
 	while (true)
 	{
-		char In = GetChar();
+		Key In = GetKey();
+		if (!In.Recognised)
+			continue;
+
 		Dimensions d = GetTerminalDimensions();
 
-		if (In == 0x0E) // Arrow key
+		if (In.Printable)
 		{
-			In = GetChar();
+			Input.insert(Input.begin() + CursorPosition, In.c);
 		}
-		else if (In == 0) // Backspace
+		else if (In.k == SpecialKey::Backspace) // Backspace
 		{
 			if (CursorPosition > 0)
 				Input.erase(Input.begin() + CursorPosition - 1);
 		}
-		else if (In == 0) // Delete
+		else if (In.k == SpecialKey::Delete) // Delete
 		{
-			if (CursorPosition > 0)
+			if (CursorPosition < Input.size() - 1)
 				Input.erase(Input.begin() + CursorPosition);
 		}
-		else if (In >= ' ' && In <= '~') // Displayable character
+		else if (In.k == SpecialKey::Home)
+			CursorPosition = 0;
+		else if (In.k == SpecialKey::End)
+			CursorPosition = Input.size() - 1;
+		else if (In.k == SpecialKey::LeftArrow)
 		{
-
+			if (CursorPosition > 0)
+				CursorPosition--;
+		}
+		else if (In.k == SpecialKey::RightArrow)
+		{
+			if (CursorPosition < Input.size() - 1)
+				CursorPosition++;
 		}
 	}
 
