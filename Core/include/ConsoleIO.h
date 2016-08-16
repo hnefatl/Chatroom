@@ -1,6 +1,8 @@
 #ifndef _CONSOLEIO_H
 #define _CONSOLEIO_H
 
+#include "Core.h"
+
 #if defined(_WIN32)
 
 #include <windows.h>
@@ -14,18 +16,18 @@
 
 #endif
 
-class Dimensions
+class CORE_API Dimensions
 {
 public:
     unsigned int Width;
     unsigned int Height;
 };
-Dimensions GetTerminalDimensions();
-void SetCursor(const unsigned int x, const unsigned int y);
-void ClearScreen();
-char GetChar();
+CORE_API Dimensions GetTerminalDimensions();
+CORE_API void SetCursor(const unsigned int x, const unsigned int y);
+CORE_API void ClearScreen();
+CORE_API char GetChar();
 
-enum SpecialKey
+enum CORE_API SpecialKey
 {
 	Backspace,
 	Delete,
@@ -39,7 +41,7 @@ enum SpecialKey
 	LeftArrow,
 	RightArrow,
 };
-class Key
+class CORE_API Key
 {
 public:
 	Key();
@@ -52,6 +54,6 @@ public:
 	char c;
 };
 
-Key GetKey();
+CORE_API Key GetKey();
 
 #endif
