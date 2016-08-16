@@ -60,20 +60,24 @@ char GetChar()
 void ClearScreen()
 {
 #if defined(_WIN32)
-	HANDLE                     hStdOut;
+	HANDLE hStdOut;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	DWORD                      count;
-	COORD                      homeCoords = { 0, 0 };
+	DWORD count;
+	COORD homeCoords = { 0, 0 };
 
 	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-	if (hStdOut == INVALID_HANDLE_VALUE) return;
-	Dimensions d=GetTerminalDimensions();
-	DWORD Cells = d.Height * d.Width;
-
-	if (!FillConsoleOutputCharacter(hStdOut, (TCHAR)' ', cellCount, homeCoords, &count))
+	if (hStdOut == INVALID_HANDLE_VALUE)
 		return;
 
-	if (!FillConsoleOutputAttribute(hStdOut, csbi.wAttributes, cellCount, homeCoords, &count))
+	Dimensions d = GetTerminalDimensions();
+	DWORD Cells = d.Height * d.Width;
+
+	GetConsoleScreenBufferInfo(hStdOut, &csbi);
+
+	if (!FillConsoleOutputCharacter(hStdOut, (TCHAR)' ', Cells, homeCoords, &count))
+		return;
+
+	if (!FillConsoleOutputAttribute(hStdOut, csbi.wAttributes, Cells, homeCoords, &count))
 		return;
 #elif defined(__linux__)
 	// TODO: Find native efficient method - use ncurses?

@@ -13,6 +13,8 @@ bool NetInit()
 	}
 
 	LogWrite("WSA started");
+
+	return true;
 }
 void NetShutdown()
 {
