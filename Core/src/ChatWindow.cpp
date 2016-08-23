@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <iomanip>
-#include <stack>
 
 ChatWindow::ChatWindow()
 {
@@ -45,7 +44,7 @@ void ChatWindow::RefreshContent()
 {
 	Dimensions d = Term.GetDimensions();
 
-	unsigned int MaxHeight = d.Height - 3;
+	unsigned int MaxHeight = d.Height - 4;
 
 	std::list<std::string> Output;
 
@@ -55,26 +54,19 @@ void ChatWindow::RefreshContent()
 		unsigned int Low = d.Width * (i->size() / d.Width);
 		unsigned int High = d.Width * (i->size() / d.Width + 1);
 
-		std::stack<std::string> TempLines;
-		while (High != 0 && Output.size() + TempLines.size() < MaxHeight)
+		while (High != 0 && Output.size() < MaxHeight)
 		{
-			TempLines.push(std::string(i->begin() + Low, (High > i->size()) ? i->end() : i->begin() + High));
+			Output.push_front(std::string(i->begin() + Low, (High > i->size()) ? i->end() : i->begin() + High));
 
 			Low -= d.Width;
 			High -= d.Width;
-		}
-
-		while (!TempLines.empty() && Output.size() + TempLines.size() < MaxHeight)
-		{
-			Output.push_front(TempLines.top());
-			TempLines.pop();
 		}
 
 		i++;
 	}
 
 	PrintLock.lock();
-	Term.ClearSection(2, MaxHeight - 1);
+	Term.ClearSection(2, MaxHeight);
 	unsigned int y = 3;
 	for (std::list<std::string>::const_reverse_iterator i = Output.rbegin(); i != Output.rend(); i++, y++)
 	{
