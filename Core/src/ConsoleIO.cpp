@@ -121,7 +121,7 @@ Key GetKey()
 	else if (Input == 9)
 		return Key(SpecialKey::Tab);
 #if defined(_WIN32)
-#error Rewrite on windows
+//#error Rewrite on windows
 #elif defined(__linux__)
 	else if (Input == 27 && GetChar() == 91)
 	{
@@ -162,15 +162,15 @@ Key GetKey()
  * RightArrow:	27  91  67
  *
  * Windows
- * Backspace:
- * Delete:
- * Enter:
- * Home:
- * End:
- * Tab:
- * BackTab:
- * UpArrow:
- * DownArrow:
- * LeftArrow:
- * RightArrow:
+ * Backspace:	8
+ * Delete:		-32 83
+ * Enter:		13
+ * Home:		-32  71
+ * End:			-32  79
+ * Tab:			8
+ * BackTab:		No character
+ * UpArrow:		-32  72
+ * DownArrow:	-32  80
+ * LeftArrow:	-32 75
+ * RightArrow:	-32 77
 */
