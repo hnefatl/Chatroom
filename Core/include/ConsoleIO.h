@@ -27,7 +27,7 @@ CORE_API void SetCursor(const unsigned int x, const unsigned int y);
 CORE_API void ClearScreen();
 CORE_API char GetChar();
 
-enum CORE_API SpecialKey
+enum SpecialKey
 {
 	None,
 	Backspace,
