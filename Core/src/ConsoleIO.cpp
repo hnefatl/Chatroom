@@ -1,28 +1,29 @@
 #include "ConsoleIO.h"
 
 #include <iostream>
+#include <iomanip>
 
 Dimensions GetTerminalDimensions()
 {
 #if defined(_WIN32)
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    Dimensions Result;
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	Dimensions Result;
 
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    Result.Width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    Result.Height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+	Result.Width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	Result.Height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 
-    return Result;
+	return Result;
 
 #elif defined(__linux__)
 
-    winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    Dimensions Result;
-    Result.Height = w.ws_row;
-    Result.Width = w.ws_col;
+	winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	Dimensions Result;
+	Result.Height = w.ws_row;
+	Result.Width = w.ws_col;
 
-    return Result;
+	return Result;
 #endif
 }
 
@@ -36,7 +37,7 @@ void SetCursor(const unsigned int x, const unsigned int y)
 
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Coord);
 #elif defined(__linux__)
-	printf("\033[%d;%dH", x+1, y+1);
+	printf("\033[%d;%dH", y + 1, x + 1);
 #endif
 }
 
@@ -80,14 +81,20 @@ void ClearScreen()
 	if (!FillConsoleOutputAttribute(hStdOut, csbi.wAttributes, Cells, homeCoords, &count))
 		return;
 #elif defined(__linux__)
-	// TODO: Find native efficient method - use ncurses?
-	system("clear");
+	Dimensions d = GetTerminalDimensions();
+
+	for (unsigned int y = 0; y < d.Height; y++)
+	{
+		SetCursor(0, y);
+		std::cout << std::setfill(' ') << std::setw(d.Width) << " ";
+	}
+
+	SetCursor(0, 0);
 #endif
 }
 
 Key::Key()
 {
-	Recognised = false;
 }
 Key::Key(const char c)
 {
@@ -116,7 +123,7 @@ Key GetKey()
 #if defined(_WIN32)
 #error Rewrite on windows
 #elif defined(__linux__)
-	else if (Input == 27 && GetChar() != 91)
+	else if (Input == 27 && GetChar() == 91)
 	{
 		Input = GetChar();
 		if (Input == 51 && GetChar() == 126)

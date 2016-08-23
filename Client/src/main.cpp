@@ -2,6 +2,7 @@
 
 #include <Log.h>
 #include <Net.h>
+#include <ChatWindow.h>
 
 int main (int argc, char *argv[])
 {
@@ -13,7 +14,17 @@ int main (int argc, char *argv[])
 
     NetInit();
 
+	ChatWindow Wnd;
+	Wnd.Start([&Wnd] (const std::string &Message)
+		{
+			if (Message == "exit")
+				Wnd.Stop();
+			else
+				Wnd.Print(Message);
+		}
+	);
 
+	Wnd.Stop();
 
     NetShutdown();
 

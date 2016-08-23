@@ -27,6 +27,7 @@ char GetChar();
 
 enum SpecialKey
 {
+	None,
 	Backspace,
 	Delete,
 	Enter,
@@ -46,10 +47,10 @@ public:
 	Key(const char c);
 	Key(const SpecialKey k);
 
-	bool Recognised;
-	bool Printable;
-	SpecialKey k;
-	char c;
+	bool Recognised = false;
+	bool Printable = false;
+	SpecialKey k = SpecialKey::None;
+	char c = 0;
 };
 
 Key GetKey();

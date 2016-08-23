@@ -9,39 +9,48 @@
 #include <condition_variable>
 #include <functional>
 
+#include "Signal.h"
+
 class ChatWindow
 {
 protected:
 	std::list<std::string> Content;
+	std::mutex ContentLock;
 	unsigned int MaxContent = 500;
 	std::list<std::string>::iterator MessagePosition; // Sort out moving up/down through message *lines*
 
 	std::string Input;
+	std::mutex InputLock;
+	unsigned int StartPosition;
 	unsigned int CursorPosition;
-	char CommandChar;
+	char CommandChar = '/';
 
 	std::function<void(const std::string &)> OnSend;
 
 	std::mutex PrintLock;
 
 	std::thread InputThread;
-	std::mutex StopLock;
-	std::condition_variable StopVar;
-	bool StopFlag;
+	Signal StopSignal;
 
     void Refresh();
+	void RefreshLines();
+	void PrintLine(const unsigned int Length);
+	void RefreshInfo();
 	void RefreshContent();
 	void RefreshInput();
-
-    void Print(const std::string &Text);
+	void PositionCursor();
+	std::string GetTrimmedInput();
 
 	void InputFunc();
 
 public:
-    ChatWindow(const std::function<void(const std::string &)> OnSend);
+	ChatWindow();
+	ChatWindow(const char CommandChar);
 
-    void Start();
+    void Start(const std::function<void(const std::string &)> OnSend);
 	void Stop();
+
+	void Print(const std::string &Text);
 };
 
 
