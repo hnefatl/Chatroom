@@ -10,6 +10,7 @@
 #include <functional>
 
 #include "Signal.h"
+#include "Console.h"
 
 class ChatWindow
 {
@@ -24,10 +25,12 @@ protected:
 	unsigned int StartPosition;
 	unsigned int CursorPosition;
 	char CommandChar = '/';
+	char LineChar = '=';
 
 	std::function<void(const std::string &)> OnSend;
 
 	std::mutex PrintLock;
+	Console Term;
 
 	std::thread InputThread;
 	Signal StopSignal;

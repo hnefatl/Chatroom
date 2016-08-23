@@ -2,8 +2,7 @@
 
 #include <algorithm>
 #include <iomanip>
-
-#include "ConsoleIO.h"
+#include <stack>
 
 ChatWindow::ChatWindow()
 {
@@ -20,63 +19,67 @@ void ChatWindow::Refresh()
 }
 void ChatWindow::RefreshLines()
 {
-	Dimensions d = GetTerminalDimensions();
+	Dimensions d = Term.GetDimensions();
 	PrintLock.lock();
 
-	SetCursor(0, 1);
-	PrintLine(d.Width);
+	Term.SetCursor(0, 1);
+	Term.PrintLine(LineChar);
 
-	SetCursor(0, d.Height - 2);
-	PrintLine(d.Width);
+	Term.SetCursor(0, d.Height - 2);
+	Term.PrintLine(LineChar);
 
 	PositionCursor();
 	PrintLock.unlock();
 }
-void ChatWindow::PrintLine(const unsigned int Length)
-{
-	std::cout << std::setfill('=') << std::setw(Length) << "" << std::setfill(' ');
-}
 void ChatWindow::RefreshInfo()
 {
-	Dimensions d = GetTerminalDimensions();
+	Dimensions d = Term.GetDimensions();
 	PrintLock.lock();
 
-	SetCursor(0, 0);
+	Term.SetCursor(0, 0);
 
 	PositionCursor();
 	PrintLock.unlock();
 }
 void ChatWindow::RefreshContent()
 {
-	Dimensions d = GetTerminalDimensions();
+	Dimensions d = Term.GetDimensions();
 
 	unsigned int MaxHeight = d.Height - 3;
 
 	std::list<std::string> Output;
 
-	std::list<std::string>::const_reverse_iterator i = Content.rbegin();
-	while (i != Content.rend() && Output.size() < MaxHeight)
+	std::list<std::string>::const_iterator i = Content.begin();
+	while (i != Content.end() && Output.size() < MaxHeight)
 	{
 		unsigned int Low = d.Width * (i->size() / d.Width);
 		unsigned int High = d.Width * (i->size() / d.Width + 1);
 
-		while (High != 0 && Output.size() < MaxHeight)
+		std::stack<std::string> TempLines;
+		while (High != 0 && Output.size() + TempLines.size() < MaxHeight)
 		{
-			Output.push_front(std::string(i->begin() + Low, (High > i->size()) ? i->end() : i->begin() + High));
+			TempLines.push(std::string(i->begin() + Low, (High > i->size()) ? i->end() : i->begin() + High));
 
 			Low -= d.Width;
 			High -= d.Width;
+		}
+
+		while (!TempLines.empty() && Output.size() + TempLines.size() < MaxHeight)
+		{
+			Output.push_front(TempLines.top());
+			TempLines.pop();
 		}
 
 		i++;
 	}
 
 	PrintLock.lock();
-	unsigned int y = 2;
-	for (std::list<std::string>::const_iterator i = Output.begin(); i != Output.end(); i++, y++)
+	Term.ClearSection(2, MaxHeight - 1);
+	unsigned int y = 3;
+	for (std::list<std::string>::const_reverse_iterator i = Output.rbegin(); i != Output.rend(); i++, y++)
 	{
-		SetCursor(0, y);
-		std::cout << std::setw(d.Width) << std::setfill(' ') << *i;
+		Term.SetCursor(0, d.Height - y);
+		Term.Print(*i);
 	}
 
 	PositionCursor();
@@ -84,24 +87,24 @@ void ChatWindow::RefreshContent()
 }
 void ChatWindow::RefreshInput()
 {
-	Dimensions d = GetTerminalDimensions();
+	Dimensions d = Term.GetDimensions();
 	std::lock(PrintLock, InputLock);
-	SetCursor(0, d.Height);
-	std::cout << std::left << std::setw(d.Width - 1) << GetTrimmedInput();
+	Term.SetCursor(0, d.Height - 1);
+	Term.ClearSection(d.Height - 1, 1);
+	Term.Print(GetTrimmedInput());
 
 	PositionCursor();
 	PrintLock.unlock();
 	InputLock.unlock();
-
 }
 void ChatWindow::PositionCursor()
 {
-	Dimensions d = GetTerminalDimensions();
-	SetCursor(CursorPosition - StartPosition, d.Height);
+	Dimensions d = Term.GetDimensions();
+	Term.SetCursor(CursorPosition - StartPosition, d.Height - 1);
 }
 std::string ChatWindow::GetTrimmedInput()
 {
-	Dimensions d = GetTerminalDimensions();
+	Dimensions d = Term.GetDimensions();
 	unsigned int End = Input.size() < d.Width - 1 ? Input.size() : StartPosition + d.Width - 1;
 	return std::string(Input.begin() + StartPosition, Input.begin() + End);
 }
@@ -111,11 +114,11 @@ void ChatWindow::InputFunc()
 {
 	while (true)
 	{
-		Key In = GetKey();
+		Key In = Term.GetKey();
 		if (!In.Recognised)
 			continue;
 
-		Dimensions d = GetTerminalDimensions();
+		Dimensions d = Term.GetDimensions();
 
 		InputLock.lock();
 		if (In.Printable)
@@ -196,10 +199,12 @@ void ChatWindow::InputFunc()
 
 void ChatWindow::Start(const std::function<void(const std::string &)> OnSend)
 {
-	if (StopSignal.Triggered())
+	if (StopSignal.IsSet())
 		return;
 
 	this->OnSend = OnSend;
+
+	Term.Start();
 
 	PositionCursor();
 	RefreshLines();
@@ -210,6 +215,8 @@ void ChatWindow::Start(const std::function<void(const std::string &)> OnSend)
 }
 void ChatWindow::Stop()
 {
+	Term.Stop();
+
 	StopSignal.Set();
 }
 
@@ -217,12 +224,12 @@ void ChatWindow::Stop()
 void ChatWindow::Print(const std::string &Text)
 {
 	std::lock(PrintLock, ContentLock);
-	Content.push_back(Text);
+	Content.push_front(Text);
 	while (Content.size() > MaxContent)
-		Content.pop_front();
+		Content.pop_back();
 
 	PrintLock.unlock();
 	ContentLock.unlock();
 
-	Refresh();
+	RefreshContent();
 }

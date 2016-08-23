@@ -1,17 +1,20 @@
 #include <iostream>
 
-#include <ConsoleIO.h>
+#include <Console.h>
 
 int main(int argc, char *argv[])
 {
+	Console Term;
+	Term.Start();
 	while (true)
 	{
-		char In = GetChar();
+		char In = Term.GetChar();
 		if (In == 9)
-			ClearScreen();
+			Term.ClearScreen();
 		else
 			std::cout << (int)In << std::endl;
 	}
+	Term.Stop();
 
 	return 0;
 }
