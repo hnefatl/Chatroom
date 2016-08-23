@@ -1,2 +1,0 @@
-#!/bin/bash
-7z a Chatroom.7z CMakeLists.txt Core/* Client/* Server/*

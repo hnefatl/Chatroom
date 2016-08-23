@@ -1,9 +1,0 @@
-#!/bin/bash
-if [ "$#" -ne 1 ]; then
-	echo "Usage: build [configuration]"
-else
-	mkdir -p "builds/$1"
-	cd "builds/$1"
-	cmake -DCMAKE_BUILD_TYPE="$1" ../.. &&
-	make
-fi
