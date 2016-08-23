@@ -6,7 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 
-class CORE_API Signal
+class Signal
 {
 protected:
 	std::mutex m;
@@ -14,15 +14,15 @@ protected:
 	bool set;
 
 public:
-	Signal();
-	Signal(const bool Set);
+	CORE_API Signal();
+	CORE_API Signal(const bool Set);
 
-	void Set();
-	void Reset();
+	CORE_API void Set();
+	CORE_API void Reset();
 
-	bool IsSet() const;
+	CORE_API bool IsSet() const;
 
-	void Wait();
+	CORE_API void Wait();
 };
 
 #endif

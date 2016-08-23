@@ -27,8 +27,12 @@ void Console::Stop()
 
 void Console::Print(const std::string &Text)
 {
+#if defined(_WIN32)
+	std::cout << Text;
+#elif defined (__linux__)
 	printw(Text.c_str());
 	refresh();
+#endif
 }
 void Console::PrintLine(const char Character)
 {
@@ -118,12 +122,13 @@ void Console::ClearSection(const unsigned int Row, const unsigned int Lines)
 	HANDLE hStdOut;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	DWORD count;
-	COORD homeCoords = { 0, Row };
+	COORD homeCoords = { 0, (SHORT)Row };
 
 	hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
 	if (hStdOut == INVALID_HANDLE_VALUE)
 		return;
 
+	Dimensions d = GetDimensions();
 	DWORD Cells = Lines * d.Width;
 
 	// Necessary?

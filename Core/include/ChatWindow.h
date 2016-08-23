@@ -1,6 +1,8 @@
 #ifndef _CHATWINDOW_H
 #define _CHATWINDOW_H
 
+#include "Core.h"
+
 #include <iostream>
 #include <mutex>
 #include <list>
@@ -47,13 +49,12 @@ protected:
 	void InputFunc();
 
 public:
-	ChatWindow();
-	ChatWindow(const char CommandChar);
+	CORE_API ChatWindow();
 
-    void Start(const std::function<void(const std::string &)> OnSend);
-	void Stop();
+	CORE_API void Start(const std::function<void(const std::string &)> OnSend);
+	CORE_API void Stop();
 
-	void Print(const std::string &Text);
+	CORE_API void Print(const std::string &Text);
 };
 
 
