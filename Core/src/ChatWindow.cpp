@@ -48,7 +48,7 @@ void ChatWindow::RefreshContent()
 
 	std::list<std::string> Output;
 
-	std::list<std::string>::const_iterator i = Content.begin();
+	std::list<std::string>::const_iterator i = MessagePosition;
 	while (i != Content.end() && Output.size() < MaxHeight)
 	{
 		unsigned int Low = d.Width * (i->size() / d.Width);
@@ -184,6 +184,22 @@ void ChatWindow::InputFunc()
 				StartPosition = CursorPosition - d.Width;
 			InputLock.unlock();
 		}
+		else if (In.k == SpecialKey::UpArrow)
+		{
+			if (MessagePosition != Content.end())
+			{
+				MessagePosition++;
+				RefreshContent();
+			}
+		}
+		else if (In.k == SpecialKey::DownArrow)
+		{
+			if (MessagePosition != Content.begin())
+			{
+				MessagePosition--;
+				RefreshContent();
+			}
+		}
 		else if (In.k == SpecialKey::Tab)
 		{
 			Refresh();
@@ -197,7 +213,9 @@ void ChatWindow::InputFunc()
 				Input.clear();
 				StartPosition = 0;
 				CursorPosition = 0;
+				RefreshContent();
 			}
+			MessagePosition = Content.begin();
 			InputLock.unlock();
 		}
 
@@ -235,8 +253,15 @@ void ChatWindow::Print(const std::string &Text)
 {
 	std::lock(PrintLock, ContentLock);
 	Content.push_front(Text);
-	while (Content.size() > MaxContent)
+	if (Content.size() == 1)
+		MessagePosition = Content.begin();
+
+	while (Content.size() > MaxMessages)
+	{
+		if (Content.end() == MessagePosition)
+			MessagePosition--;
 		Content.pop_back();
+	}
 
 	PrintLock.unlock();
 	ContentLock.unlock();

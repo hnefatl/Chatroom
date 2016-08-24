@@ -6,6 +6,7 @@
 #include <iostream>
 #include <mutex>
 #include <list>
+#include <vector>
 #include <string>
 #include <thread>
 #include <condition_variable>
@@ -17,15 +18,15 @@
 class ChatWindow
 {
 protected:
-	std::list<std::string> Content;
+	std::list<std::string> Content; // All the "messages"
 	std::mutex ContentLock;
-	unsigned int MaxContent = 500;
-	unsigned int MessagePosition;
+	unsigned int MaxMessages = 500; // Cap on number of messages
+	std::list<std::string>::iterator MessagePosition; // Current message at the bottom of the box
 
-	std::string Input;
+	std::string Input; // Buffer holding current input string
 	std::mutex InputLock;
-	unsigned int StartPosition;
-	unsigned int CursorPosition;
+	unsigned int StartPosition; // Index in the input string of the left-most character printed
+	unsigned int CursorPosition; // Index in the input string of the currently selected character
 	char CommandChar = '/';
 	char LineChar = '=';
 

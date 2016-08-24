@@ -5,14 +5,14 @@
 
 #include <vector>
 
-class CORE_API Encodable
+class Encodable
 {
 public:
-    std::vector<unsigned char> Encode(const bool Partial) const;
-    void Encode(std::vector<unsigned char> &Buffer, const bool Partial) const;
+    CORE_API std::vector<unsigned char> Encode(const bool Partial) const;
+    CORE_API void Encode(std::vector<unsigned char> &Buffer, const bool Partial) const;
 
-    bool Decode(const std::vector<unsigned char> &Buffer, const bool Partial);
-    bool Decode(const std::vector<unsigned char> &Buffer, std::size_t &Start, const bool Partial);
+    CORE_API bool Decode(const std::vector<unsigned char> &Buffer, const bool Partial);
+    CORE_API bool Decode(const std::vector<unsigned char> &Buffer, std::size_t &Start, const bool Partial);
 
 protected:
     virtual void _Encode(std::vector<unsigned char> &Buffer, const bool Partial) const = 0;
