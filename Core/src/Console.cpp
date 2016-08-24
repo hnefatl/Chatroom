@@ -187,8 +187,6 @@ Key Console::GetKey()
 			return Key(SpecialKey::End);
 		else if (Input == 72)
 			return Key(SpecialKey::Home);
-		else if (Input == 90)
-			return Key(SpecialKey::BackTab);
 		else if (Input == 65)
 			return Key(SpecialKey::UpArrow);
 		else if (Input == 66)

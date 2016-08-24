@@ -112,16 +112,18 @@ void ChatWindow::InputFunc()
 
 		Dimensions d = Term.GetDimensions();
 
-		InputLock.lock();
 		if (In.Printable)
 		{
+			InputLock.lock();
 			Input.insert(Input.begin() + CursorPosition, In.c);
 			CursorPosition++;
 			if (CursorPosition > d.Width - 2)
 				StartPosition = CursorPosition - d.Width + 1;
+			InputLock.unlock();
 		}
 		else if (In.k == SpecialKey::Backspace)
 		{
+			InputLock.lock();
 			if (CursorPosition > 0)
 			{
 				Input.erase(Input.begin() + CursorPosition - 1);
@@ -131,21 +133,27 @@ void ChatWindow::InputFunc()
 				if (CursorPosition > d.Width - 2)
 					StartPosition--;
 			}
+			InputLock.unlock();
 		}
 		else if (In.k == SpecialKey::Delete)
 		{
+			InputLock.lock();
 			if (CursorPosition < Input.size())
 				Input.erase(Input.begin() + CursorPosition);
 			if (CursorPosition >= Input.size() && CursorPosition != 0)
 				CursorPosition = Input.size();
+			InputLock.unlock();
 		}
 		else if (In.k == SpecialKey::Home)
 		{
+			InputLock.lock();
 			CursorPosition = 0;
 			StartPosition = 0;
+			InputLock.unlock();
 		}
 		else if (In.k == SpecialKey::End)
 		{
+			InputLock.lock();
 			if (Input.size() > 0)
 			{
 				CursorPosition = Input.size();
@@ -156,20 +164,25 @@ void ChatWindow::InputFunc()
 			}
 			else
 				CursorPosition = 0;
+			InputLock.unlock();
 		}
 		else if (In.k == SpecialKey::LeftArrow)
 		{
+			InputLock.lock();
 			if (CursorPosition > 0)
 				CursorPosition--;
 			if (StartPosition > CursorPosition)
 				StartPosition = CursorPosition;
+			InputLock.unlock();
 		}
 		else if (In.k == SpecialKey::RightArrow)
 		{
+			InputLock.lock();
 			if (CursorPosition < Input.size())
 				CursorPosition++;
 			if (CursorPosition > StartPosition + d.Width - 1)
 				StartPosition = CursorPosition - d.Width;
+			InputLock.unlock();
 		}
 		else if (In.k == SpecialKey::Tab)
 		{
@@ -177,6 +190,7 @@ void ChatWindow::InputFunc()
 		}
 		else if (In.k == SpecialKey::Enter)
 		{
+			InputLock.lock();
 			if (Input.size() > 0)
 			{
 				OnSend(Input);
@@ -184,8 +198,8 @@ void ChatWindow::InputFunc()
 				StartPosition = 0;
 				CursorPosition = 0;
 			}
+			InputLock.unlock();
 		}
-		InputLock.unlock();
 
 		RefreshInput();
 	}
