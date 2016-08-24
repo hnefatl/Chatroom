@@ -131,13 +131,10 @@ void Console::ClearSection(const unsigned int Row, const unsigned int Lines)
 	Dimensions d = GetDimensions();
 	DWORD Cells = Lines * d.Width;
 
-	// Necessary?
 	GetConsoleScreenBufferInfo(hStdOut, &csbi);
 
 	if (!FillConsoleOutputCharacter(hStdOut, (TCHAR)' ', Cells, homeCoords, &count))
 		return;
-
-	// Necessary?
 	if (!FillConsoleOutputAttribute(hStdOut, csbi.wAttributes, Cells, homeCoords, &count))
 		return;
 #elif defined(__linux__)
@@ -157,12 +154,29 @@ Key Console::GetKey()
 		return Key(Input);
 	else if (Input == 127 || Input == 8)
 		return Key(SpecialKey::Backspace);
-	else if (Input == 10)
+	else if (Input == 10 || Input == 13)
 		return Key(SpecialKey::Enter);
 	else if (Input == 9)
 		return Key(SpecialKey::Tab);
 #if defined(_WIN32)
-//#error Rewrite on windows
+	else if (Input == -32)
+	{
+		Input = GetChar();
+		if (Input == 83)
+			return Key(SpecialKey::Delete);
+		else if (Input == 71)
+			return Key(SpecialKey::Home);
+		else if (Input == 79)
+			return Key(SpecialKey::End);
+		else if (Input == 72)
+			return Key(SpecialKey::UpArrow);
+		else if (Input == 80)
+			return Key(SpecialKey::DownArrow);
+		else if (Input == 75)
+			return Key(SpecialKey::LeftArrow);
+		else if (Input == 77)
+			return Key(SpecialKey::RightArrow);
+	}
 #elif defined(__linux__)
 	else if (Input == 27 && GetChar() == 91)
 	{
@@ -195,8 +209,7 @@ Key Console::GetKey()
 	 * Enter:		10
 	 * Home:		27  91  72
 	 * End:			27  91  70
-	 * Tab:			8
-	 * BackTab:		27  91  90
+	 * Tab:			9
 	 * UpArrow:		27  91  65
 	 * DownArrow:	27  91  66
 	 * LeftArrow:	27  91  68
@@ -206,12 +219,11 @@ Key Console::GetKey()
 	 * Backspace:	8
 	 * Delete:		-32 83
 	 * Enter:		13
-	 * Home:		-32  71
-	 * End:			-32  79
-	 * Tab:			8
-	 * BackTab:		No character
-	 * UpArrow:		-32  72
-	 * DownArrow:	-32  80
+	 * Home:		-32 71
+	 * End:			-32 79
+	 * Tab:			9
+	 * UpArrow:		-32 72
+	 * DownArrow:	-32 80
 	 * LeftArrow:	-32 75
 	 * RightArrow:	-32 77
 	*/

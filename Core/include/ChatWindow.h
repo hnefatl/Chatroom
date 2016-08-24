@@ -20,7 +20,7 @@ protected:
 	std::list<std::string> Content;
 	std::mutex ContentLock;
 	unsigned int MaxContent = 500;
-	std::list<std::string>::iterator MessagePosition; // Sort out moving up/down through message *lines*
+	unsigned int MessagePosition;
 
 	std::string Input;
 	std::mutex InputLock;
@@ -39,7 +39,6 @@ protected:
 
     void Refresh();
 	void RefreshLines();
-	void PrintLine(const unsigned int Length);
 	void RefreshInfo();
 	void RefreshContent();
 	void RefreshInput();

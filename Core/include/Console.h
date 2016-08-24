@@ -35,7 +35,6 @@ enum SpecialKey
 	Home,
 	End,
 	Tab,
-	BackTab,
 	UpArrow,
 	DownArrow,
 	LeftArrow,

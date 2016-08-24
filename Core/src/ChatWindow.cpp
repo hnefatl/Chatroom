@@ -137,7 +137,7 @@ void ChatWindow::InputFunc()
 			if (CursorPosition < Input.size())
 				Input.erase(Input.begin() + CursorPosition);
 			if (CursorPosition >= Input.size() && CursorPosition != 0)
-				CursorPosition = Input.size() - 1;
+				CursorPosition = Input.size();
 		}
 		else if (In.k == SpecialKey::Home)
 		{
@@ -148,7 +148,7 @@ void ChatWindow::InputFunc()
 		{
 			if (Input.size() > 0)
 			{
-				CursorPosition = Input.size() - 1;
+				CursorPosition = Input.size();
 				if (Input.size() < d.Width)
 					StartPosition = 0;
 				else
@@ -170,6 +170,10 @@ void ChatWindow::InputFunc()
 				CursorPosition++;
 			if (CursorPosition > StartPosition + d.Width - 1)
 				StartPosition = CursorPosition - d.Width;
+		}
+		else if (In.k == SpecialKey::Tab)
+		{
+			Refresh();
 		}
 		else if (In.k == SpecialKey::Enter)
 		{
