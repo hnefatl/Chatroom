@@ -8,9 +8,9 @@ int main (int argc, char *argv[])
 {
     LogInit("Log.txt");
 
-    LogWrite("Standard message");
-    LogWriteWarning("Warning warning");
-    LogWriteError("Error error");
+    Log("Standard message");
+    LogWarning("Warning warning");
+    LogError("Error error");
 
     NetInit();
 

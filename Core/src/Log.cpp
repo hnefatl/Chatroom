@@ -3,34 +3,34 @@
 #include <time.h>
 #include <sstream>
 
-std::ofstream Log;
-std::mutex Lock;
+std::ofstream LogFile;
+std::recursive_mutex Lock;
 
-CORE_API bool LogInit(const std::string &LogFile)
+CORE_API bool LogInit(const std::string &LogPath)
 {
     Lock.lock();
-    if(Log.is_open())
-        return true;
+    if (LogFile.is_open())
+        LogShutdown();
 
-    Log.open(LogFile);
-    if(!Log.good())
+    LogFile.open(LogPath);
+    if (!LogFile.good())
     {
         Lock.unlock();
         return false;
     }
 
-    _LogWrite("Log opened");
+    _Log("Log opened at " + LogPath);
     Lock.unlock();
     return true;
 }
 CORE_API void LogShutdown()
 {
     Lock.lock();
-    if(!Log.is_open())
+    if(!LogFile.is_open())
         return;
 
-    _LogWrite("Log closed");
-    Log.close();
+    _Log("Log closed");
+    LogFile.close();
     Lock.unlock();
 }
 
@@ -45,26 +45,45 @@ std::string GetTimeStamp()
 
     return Formatted.str();
 }
-void _LogWrite(const std::string &Message)
+void _Log(const std::string &Message)
 {
-    if(Log.is_open())
-        Log << "[" << GetTimeStamp() << "] "<<Message<<std::endl;
+	_Log(Message.c_str());
 }
-CORE_API void LogWrite(const std::string &Message)
+void _Log(const char *Message)
+{
+    if(LogFile.is_open())
+        LogFile << "[" << GetTimeStamp() << "] " << Message << std::endl;
+}
+bool Log(const std::string &Message, const bool RetVal)
+{
+	return Log(Message.c_str(), RetVal);
+}
+bool Log(const char *Message, const bool RetVal)
+{
+	Lock.lock();
+    _Log(Message);
+    Lock.unlock();
+	return RetVal;
+}
+bool LogWarning(const std::string &Message, const bool RetVal)
+{
+	return Log(Message.c_str(), RetVal);
+}
+bool LogWarning(const char *Message, const bool RetVal)
 {
     Lock.lock();
-    _LogWrite(Message);
+    _Log((std::string("Warning: ") + Message).c_str());
     Lock.unlock();
+	return RetVal;
 }
-CORE_API void LogWriteWarning(const std::string &Message)
+bool LogError(const std::string &Message, const bool RetVal)
+{
+	return Log(Message.c_str(), RetVal);
+}
+bool LogError(const char *Message, const bool RetVal)
 {
     Lock.lock();
-    _LogWrite("Warning: " + Message);
+	_Log((std::string("Error: ") + Message).c_str());
     Lock.unlock();
-}
-CORE_API void LogWriteError(const std::string &Message)
-{
-    Lock.lock();
-    _LogWrite("Error: " + Message);
-    Lock.unlock();
+	return RetVal;
 }

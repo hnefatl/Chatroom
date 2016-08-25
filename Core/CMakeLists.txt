@@ -6,6 +6,8 @@ file(GLOB_RECURSE Core_Sources "${CORE_SOURCE_DIR}/*.cpp")
 
 include_directories(${CORE_INCLUDE_DIR})
 add_library(Core SHARED ${Core_Sources} ${Core_Headers})
+include_directories(${SQL_INCLUDE_DIR})
+target_link_libraries(Core Sqlite3)
 
 if(WIN32)
 	target_link_libraries(Core ws2_32)
