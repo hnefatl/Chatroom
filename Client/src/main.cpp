@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <Log.h>
-#include <Net.h>
+#include <Net/Net.h>
 #include <ChatWindow.h>
 
 int main (int argc, char *argv[])
@@ -12,7 +12,7 @@ int main (int argc, char *argv[])
     LogWarning("Warning warning");
     LogError("Error error");
 
-    NetInit();
+    Net::NetInit();
 
 	ChatWindow Wnd;
 	Wnd.Start([&Wnd] (const std::string &Message)
@@ -26,7 +26,7 @@ int main (int argc, char *argv[])
 
 	Wnd.Stop();
 
-    NetShutdown();
+    Net::NetShutdown();
 
     LogShutdown();
 	return 0;

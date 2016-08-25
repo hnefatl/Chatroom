@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <Log.h>
-#include <Net.h>
+#include <Net/Net.h>
 
 #include <Data/Database.h>
 
@@ -10,11 +10,11 @@ void DbTest();
 int main(int argc, char *argv[])
 {
 	LogInit("Log.txt");
-	NetInit();
+	Net::NetInit();
 
 	DbTest();
 
-	NetShutdown();
+	Net::NetShutdown();
 	LogShutdown();
 	return 0;
 }
