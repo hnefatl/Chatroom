@@ -42,6 +42,7 @@ void ChatWindow::RefreshInfo()
 }
 void ChatWindow::RefreshContent()
 {
+	ContentLock.lock();
 	Dimensions d = Term.GetDimensions();
 
 	unsigned int MaxHeight = d.Height - 4;
@@ -76,6 +77,7 @@ void ChatWindow::RefreshContent()
 
 	PositionCursor();
 	PrintLock.unlock();
+	ContentLock.unlock();
 }
 void ChatWindow::RefreshInput()
 {
@@ -213,11 +215,10 @@ void ChatWindow::InputFunc()
 			InputLock.lock();
 			if (Input.size() > 0)
 			{
-				OnSend(Input);
+				UserInput.Push(Input);
 				Input.clear();
 				StartPosition = 0;
 				CursorPosition = 0;
-				RefreshContent();
 			}
 			MessagePosition = Content.begin();
 			InputLock.unlock();
@@ -227,12 +228,10 @@ void ChatWindow::InputFunc()
 	}
 }
 
-void ChatWindow::Start(const std::function<void(const std::string &)> OnSend)
+void ChatWindow::Start()
 {
 	if (StopSignal.IsSet())
 		return;
-
-	this->OnSend = OnSend;
 
 	Term.Start();
 
@@ -240,8 +239,6 @@ void ChatWindow::Start(const std::function<void(const std::string &)> OnSend)
 	RefreshLines();
 
 	InputThread = std::thread(&ChatWindow::InputFunc, this);
-
-	StopSignal.Wait();
 }
 void ChatWindow::Stop()
 {

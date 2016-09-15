@@ -14,6 +14,7 @@
 
 #include "Signal.h"
 #include "Console.h"
+#include "InputQueue.h"
 
 class ChatWindow
 {
@@ -29,8 +30,6 @@ protected:
 	unsigned int CursorPosition; // Index in the input string of the currently selected character
 	char CommandChar = '/';
 	char LineChar = '=';
-
-	std::function<void(const std::string &)> OnSend;
 
 	std::mutex PrintLock;
 	Console Term;
@@ -49,9 +48,11 @@ protected:
 	void InputFunc();
 
 public:
+	InputQueue UserInput;
+
 	CORE_API ChatWindow();
 
-	CORE_API void Start(const std::function<void(const std::string &)> OnSend);
+	CORE_API void Start();
 	CORE_API void Stop();
 
 	CORE_API void Print(const std::string &Text);

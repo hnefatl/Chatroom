@@ -15,14 +15,15 @@ int main (int argc, char *argv[])
     Net::NetInit();
 
 	ChatWindow Wnd;
-	Wnd.Start([&Wnd] (const std::string &Message)
-		{
-			if (Message == "exit")
-				Wnd.Stop();
-			else
-				Wnd.Print(Message);
-		}
-	);
+	Wnd.Start();
+
+	while (true)
+	{
+		std::string Input = Wnd.UserInput.Pop();
+		if (Input == "exit")
+			break;
+		Wnd.Print(Input);
+	}
 
 	Wnd.Stop();
 
