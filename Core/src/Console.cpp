@@ -101,10 +101,10 @@ Nullable<char> Console::GetChar(const unsigned int TimeoutMs, const unsigned int
 	while (std::chrono::high_resolution_clock::now() - Start < WaitDuration)
 	{
 #if defined(_WIN32)
-		if (kbhit())
+		if (_kbhit())
 			return Nullable<char>((char)_getch());
 #elif defined(__linux__)
-		int ch = getch();
+		int ch = _getch();
 		if (ch != ERR)
 			return Nullable<char>((char)ch);
 #endif

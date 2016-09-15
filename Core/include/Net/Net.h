@@ -2,7 +2,6 @@
 #define _NET_H
 
 #include "Core.h"
-#include "Log.h"
 
 #include <vector>
 #include <string>

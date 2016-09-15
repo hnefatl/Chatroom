@@ -5,10 +5,10 @@
 
 namespace Data
 {
-	class CORE_API Server
+	class Server
 	{
 	public:
-		static const std::string CreationString;
+		CORE_API static const std::string CreationString;
 
 		Net::Address Address; // Primary key
 		std::string Name;

@@ -6,6 +6,7 @@ file(GLOB_RECURSE Server_Sources "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${SERVER_INCLUDE_DIR})
 add_executable(Server ${Server_Sources} ${Server_Headers})
-
+include_directories(${SQL_INCLUDE_DIR})
+target_link_libraries(Server Sqlite3)
 include_directories(${CORE_INCLUDE_DIR})
 target_link_libraries(Server Core)

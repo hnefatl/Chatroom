@@ -1,4 +1,6 @@
-#include "Net/Net.h"
+#include <Net/Net.h>
+
+#include <Log.h>
 
 namespace Net
 {
@@ -10,18 +12,18 @@ namespace Net
 		int Result = WSAStartup(MAKEWORD(2, 0), &Version);
 		if (Result != 0)
 		{
-			LogWriteError("Failed to start WSA, code " + Result);
+			LogError("Failed to start WSA, code " + Result);
 			return false;
 		}
 
-		LogWrite("WSA started");
+		Log("WSA started");
 
 		return true;
 	}
 	void NetShutdown()
 	{
 		WSACleanup();
-		LogWrite("WSA stopped");
+		Log("WSA stopped");
 	}
 
 #elif defined(__linux__)

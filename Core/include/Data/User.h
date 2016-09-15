@@ -7,10 +7,10 @@
 
 namespace Data
 {
-	class CORE_API User
+	class User
 	{
 	public:
-		static const std::string CreationString;
+		CORE_API static const std::string CreationString;
 
 		std::string Username; // Primary key
 		std::string Password;

@@ -6,5 +6,7 @@ file(GLOB_RECURSE Client_Sources "${CLIENT_SOURCE_DIR}/*.cpp")
 
 include_directories(${CLIENT_INCLUDE_DIR})
 add_executable(Client ${Client_Sources} ${Client_Headers})
+include_directories(${SQL_INCLUDE_DIR})
+target_link_libraries(Client Sqlite3)
 include_directories(${CORE_INCLUDE_DIR})
 target_link_libraries(Client Core)

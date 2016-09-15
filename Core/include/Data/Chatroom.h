@@ -10,10 +10,10 @@
 
 namespace Data
 {
-	class CORE_API Chatroom
+	class Chatroom
 	{
 	public:
-		static const std::string CreationString;
+		CORE_API static const std::string CreationString;
 
 		std::string Name; // Primary key
 		std::string OwnerUsername; // Foreign key
