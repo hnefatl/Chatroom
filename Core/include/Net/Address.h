@@ -26,6 +26,8 @@ namespace Net
 
 		CORE_API bool IPv4() const;
 		CORE_API bool IPv6() const;
+
+		void operator =(const Address &Rhs);
 	};
 }
 

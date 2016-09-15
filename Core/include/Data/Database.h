@@ -21,7 +21,6 @@ namespace Data
 	protected:
 		sqlite3 *Inner;
 
-		bool _GetAddress(Statement &s, Net::Address &Out);
 		bool _GetUser(Statement &s, User &Out);
 		bool _GetServer(Statement &s, Server &Out);
 		bool _GetChatroom(Statement &s, Chatroom &Out);

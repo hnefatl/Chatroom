@@ -32,7 +32,7 @@ namespace Data
 		if (Inner == nullptr)
 			return false;
 
-		int Err = sqlite3_bind_text(Inner, sqlite3_bind_parameter_index(Inner, Name.c_str()), Value.c_str(), Name.size(), nullptr);
+		int Err = sqlite3_bind_text(Inner, sqlite3_bind_parameter_index(Inner, Name.c_str()), Value.c_str(), -1, nullptr);
 		if (Err != SQLITE_OK)
 		{
 			Finalise();
@@ -73,7 +73,7 @@ namespace Data
 	bool Statement::Execute()
 	{
 		int Err = sqlite3_step(Inner);
-		if (Err != SQLITE_DONE)
+		if (Err != SQLITE_DONE && Err != SQLITE_ROW)
 		{
 			Finalise();
 			return LogError(sqlite3_errstr(Err), false);

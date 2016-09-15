@@ -7,8 +7,8 @@
 
 #include "Core.h"
 
-extern std::ofstream LogFile;
-extern std::recursive_mutex Lock;
+static std::ofstream LogFile;
+static std::recursive_mutex Lock;
 
 CORE_API bool LogInit(const std::string &LogPath = "Log.txt");
 CORE_API void LogShutdown();

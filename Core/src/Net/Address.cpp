@@ -1,6 +1,7 @@
 #include "Net/Address.h"
 
 #include <sstream>
+#include <cstring>
 
 namespace Net
 {
@@ -26,10 +27,14 @@ namespace Net
 	{
 		this->Family = Family;
 		this->Port = Port;
+		Addr = new sockaddr_storage();
+		int Err;
 		if (IPv4())
-			inet_pton(AF_INET, IP.c_str(), &((sockaddr_in *)Addr)->sin_addr);
+			Err = inet_pton(AF_INET, IP.c_str(), &((sockaddr_in *)Addr)->sin_addr);
 		else
-			inet_pton(AF_INET6, IP.c_str(), &((sockaddr_in6 *)Addr)->sin6_addr);
+			Err = inet_pton(AF_INET6, IP.c_str(), &((sockaddr_in6 *)Addr)->sin6_addr);
+
+		int x = 7;
 	}
 	Address::~Address()
 	{
@@ -44,7 +49,8 @@ namespace Net
 
 		char Buffer[INET6_ADDRSTRLEN];
 		inet_ntop(Family, Addr, Buffer, INET6_ADDRSTRLEN);
-		return std::string(Buffer);
+		std::string Result = std::string(Buffer);
+		return Result;
 	}
 	std::string Address::GetPrintableAddress() const
 	{
@@ -69,16 +75,20 @@ namespace Net
 
 	bool Address::IPv4() const
 	{
-		if(Addr == nullptr)
-			throw std::exception();
-
 		return Family == AF_INET;
 	}
 	bool Address::IPv6() const
 	{
-		if(Addr == nullptr)
-			throw std::exception();
-
 		return Family == AF_INET6;
+	}
+
+	void Address::operator =(const Address &Rhs)
+	{
+		Family = Rhs.Family;
+		Port = Rhs.Port;
+		if (Rhs.Addr != nullptr)
+			Addr = new sockaddr_storage(*Rhs.Addr);
+		else
+			Addr = nullptr;
 	}
 }

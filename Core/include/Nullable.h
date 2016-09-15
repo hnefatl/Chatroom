@@ -17,6 +17,12 @@ public:
 		Null = false;
 		this->Value = Value;
 	}
+
+	void operator =(const T &Value)
+	{
+		Null = false;
+		this->Value = Value;
+	}
 };
 
 #endif
