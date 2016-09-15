@@ -104,7 +104,7 @@ Nullable<char> Console::GetChar(const unsigned int TimeoutMs, const unsigned int
 		if (_kbhit())
 			return Nullable<char>((char)_getch());
 #elif defined(__linux__)
-		int ch = _getch();
+		int ch = getch();
 		if (ch != ERR)
 			return Nullable<char>((char)ch);
 #endif
