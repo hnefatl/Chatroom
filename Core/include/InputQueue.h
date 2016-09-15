@@ -1,6 +1,8 @@
 #ifndef _INPUTQUEUE_H
 #define _INPUTQUEUE_H
 
+#include "Core.h"
+
 #include <mutex>
 #include <queue>
 #include <string>
@@ -14,8 +16,8 @@ protected:
 	std::condition_variable QueueVar;
 
 public:
-	void Push(const std::string &Message);
-	std::string Pop();
+	CORE_API void Push(const std::string &Message);
+	CORE_API std::string Pop();
 };
 
 #endif
