@@ -104,11 +104,15 @@ std::string ChatWindow::GetTrimmedInput()
 
 void ChatWindow::InputFunc()
 {
-	while (true)
+	while (!StopSignal.IsSet())
 	{
-		Key In = Term.GetKey();
-		if (!In.Recognised)
+		Nullable<Key> k = Term.GetKey(100, 10); // Nonblocking read key, if no key read in 100ms then return Null
+		if (k.Null || !k.Value.Recognised)
 			continue;
+		if (StopSignal.IsSet())
+			break;
+
+		Key In = k.Value;
 
 		Dimensions d = Term.GetDimensions();
 
@@ -221,8 +225,6 @@ void ChatWindow::InputFunc()
 
 		RefreshInput();
 	}
-
-	Stop();
 }
 
 void ChatWindow::Start(const std::function<void(const std::string &)> OnSend)
@@ -246,6 +248,7 @@ void ChatWindow::Stop()
 	Term.Stop();
 
 	StopSignal.Set();
+	InputThread.join();
 }
 
 
@@ -253,8 +256,7 @@ void ChatWindow::Print(const std::string &Text)
 {
 	std::lock(PrintLock, ContentLock);
 	Content.push_front(Text);
-	if (Content.size() == 1)
-		MessagePosition = Content.begin();
+	MessagePosition = Content.begin();
 
 	while (Content.size() > MaxMessages)
 	{

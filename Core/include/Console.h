@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include <Nullable.h>
+
 #if defined(_WIN32)
 
 #include <windows.h>
@@ -55,6 +57,9 @@ public:
 
 class CORE_API Console
 {
+protected:
+	Key MapKey(char c);
+
 public:
 	Console();
 	~Console();
@@ -70,8 +75,10 @@ public:
 	void ClearScreen();
 	void ClearSection(const unsigned int Row, const unsigned int Lines);
 	char GetChar();
+	Nullable<char> GetChar(const unsigned int TimeoutMs, const unsigned int Jump = 10);
 
 	Key GetKey();
+	Nullable<Key> GetKey(const unsigned int TimeoutMs, const unsigned int Jump = 10);
 };
 
 

@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <chrono>
+#include <thread>
 
 Console::Console()
 {
@@ -85,8 +87,30 @@ char Console::GetChar()
 #if defined(_WIN32)
 	return (char)_getch();
 #elif defined(__linux__)
+	nodelay(stdscr, false);
 	return (char)getch();
 #endif
+}
+Nullable<char> Console::GetChar(const unsigned int TimeoutMs, const unsigned int Jump)
+{
+#if defined(__linux__)
+	nodelay(stdscr, true);
+#endif
+	auto Start = std::chrono::high_resolution_clock::now();
+	std::chrono::milliseconds WaitDuration(TimeoutMs);
+	while (std::chrono::high_resolution_clock::now() - Start < WaitDuration)
+	{
+#if defined(_WIN32)
+		if (kbhit())
+			return Nullable<char>((char)_getch());
+#elif defined(__linux__)
+		int ch = getch();
+		if (ch != ERR)
+			return Nullable<char>((char)ch);
+#endif
+		std::this_thread::sleep_for(std::chrono::milliseconds(Jump));
+	}
+	return Nullable<char>();
 }
 
 void Console::ClearScreen()
@@ -147,53 +171,52 @@ void Console::ClearSection(const unsigned int Row, const unsigned int Lines)
 #endif
 }
 
-Key Console::GetKey()
+Key Console::MapKey(char c)
 {
-	char Input = GetChar();
-	if (Input >= ' ' && Input <= '~') // Space through to ~ are all printable characters
-		return Key(Input);
-	else if (Input == 127 || Input == 8)
+	if (c >= ' ' && c <= '~') // Space through to ~ are all printable characters
+		return Key(c);
+	else if (c == 127 || c == 8)
 		return Key(SpecialKey::Backspace);
-	else if (Input == 10 || Input == 13)
+	else if (c == 10 || c == 13)
 		return Key(SpecialKey::Enter);
-	else if (Input == 9)
+	else if (c == 9)
 		return Key(SpecialKey::Tab);
 #if defined(_WIN32)
-	else if (Input == -32)
+	else if (c == -32)
 	{
-		Input = GetChar();
-		if (Input == 83)
+		c = GetChar();
+		if (c == 83)
 			return Key(SpecialKey::Delete);
-		else if (Input == 71)
+		else if (c == 71)
 			return Key(SpecialKey::Home);
-		else if (Input == 79)
+		else if (c == 79)
 			return Key(SpecialKey::End);
-		else if (Input == 72)
+		else if (c == 72)
 			return Key(SpecialKey::UpArrow);
-		else if (Input == 80)
+		else if (c == 80)
 			return Key(SpecialKey::DownArrow);
-		else if (Input == 75)
+		else if (c == 75)
 			return Key(SpecialKey::LeftArrow);
-		else if (Input == 77)
+		else if (c == 77)
 			return Key(SpecialKey::RightArrow);
 	}
 #elif defined(__linux__)
-	else if (Input == 27 && GetChar() == 91)
+	else if (c == 27 && GetChar() == 91)
 	{
-		Input = GetChar();
-		if (Input == 51 && GetChar() == 126)
+		c = GetChar();
+		if (c == 51 && GetChar() == 126)
 			return Key(SpecialKey::Delete);
-		else if (Input == 70)
+		else if (c == 70)
 			return Key(SpecialKey::End);
-		else if (Input == 72)
+		else if (c == 72)
 			return Key(SpecialKey::Home);
-		else if (Input == 65)
+		else if (c == 65)
 			return Key(SpecialKey::UpArrow);
-		else if (Input == 66)
+		else if (c == 66)
 			return Key(SpecialKey::DownArrow);
-		else if (Input == 68)
+		else if (c == 68)
 			return Key(SpecialKey::LeftArrow);
-		else if (Input == 67)
+		else if (c == 67)
 			return Key(SpecialKey::RightArrow);
 	}
 #endif
@@ -225,6 +248,19 @@ Key Console::GetKey()
 	 * LeftArrow:	-32 75
 	 * RightArrow:	-32 77
 	*/
+}
+
+Key Console::GetKey()
+{
+	return MapKey(GetChar());
+}
+Nullable<Key> Console::GetKey(const unsigned int TimeoutMs, const unsigned int Jump)
+{
+	Nullable<char> c = GetChar(TimeoutMs, Jump);
+	if (c.Null)
+		return Nullable<Key>();
+
+	return Nullable<Key>(MapKey(c.Value));
 }
 
 Key::Key()
