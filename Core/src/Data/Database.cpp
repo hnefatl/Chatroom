@@ -75,7 +75,7 @@ namespace Data
 		if (!s.Bind(":Username", Username.c_str()))
 			return false;
 
-		if (!s.Execute())
+		if (!s.Step())
 			return false;
 
 		if (!_GetUser(s, Out))
@@ -121,7 +121,9 @@ namespace Data
 		if (Family.Null || IP.Null || Port.Null || Name.Null)
 			return false;
 
-		Out.Address = Net::Address(Family.Value, IP.Value, Port.Value);
+		Net::Address Address;
+		Address.Load(Family.Value, IP.Value, Port.Value);
+		Out.Address = Address;
 		Out.Name = Name.Value;
 
 		return true;
@@ -137,7 +139,7 @@ namespace Data
 		if (!s.Bind(":Family", Address.Family) || !s.Bind(":IP", Address.GetPrintableIP()) || !s.Bind(":Port", Address.Port))
 			return false;
 
-		if (!s.Execute())
+		if (!s.Step())
 			return false;
 
 		if (!_GetServer(s, Out))
@@ -187,9 +189,11 @@ namespace Data
 		if (Name.Null || OwnerUsername.Null || ServerIP.Null || ServerFamily.Null || ServerPort.Null)
 			return false;
 
+		Net::Address Address;
+		Address.Load(ServerFamily.Value, ServerIP.Value, ServerPort.Value);
 		Out.Name = Name.Value;
 		Out.OwnerUsername = OwnerUsername.Value;
-		Out.ServerAddress = Net::Address(ServerFamily.Value, ServerIP.Value, ServerPort.Value);
+		Out.ServerAddress = Address;
 		Out.Password = Password;
 		Out.Description = Description;
 
@@ -197,7 +201,7 @@ namespace Data
 	}
 	bool Database::GetChatroom(const std::string &Name, Chatroom &Out)
 	{
-		const std::string Query = "SELECT * FROM Chatroom WHERE Name = :Name:";
+		const std::string Query = "SELECT * FROM Chatroom WHERE Name = :Name";
 
 		Statement s;
 		if (!s.Prepare(Inner, Query))
@@ -206,7 +210,7 @@ namespace Data
 		if (!s.Bind(":Name", Name))
 			return false;
 
-		if (!s.Execute())
+		if (!s.Step())
 			return false;
 
 		if (!_GetChatroom(s, Out))
@@ -314,7 +318,7 @@ namespace Data
 		if (!s.Prepare(Inner, Query))
 			return false;
 
-		if (!s.Bind(":IP", Server.Address.GetPrintableIP()) || !s.Bind(":Port", Server.Address.Port) || !s.Bind(":Family", Server.Address.Port) || !s.Bind(":Name", Server.Name))
+		if (!s.Bind(":IP", Server.Address.GetPrintableIP()) || !s.Bind(":Port", Server.Address.Port) || !s.Bind(":Family", Server.Address.Family) || !s.Bind(":Name", Server.Name))
 			return false;
 
 		if (!s.Execute())

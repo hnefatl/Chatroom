@@ -20,24 +20,34 @@ int main(int argc, char *argv[])
 
 	Net::NetShutdown();
 	LogShutdown();
+
 	return 0;
 }
 
 void DbTest()
 {
-	Data::User TestUser;
-	TestUser.Username = "hnefatl";
-	TestUser.Password = "blahpass";
+	Net::Address Address;
+	Address.Load(AF_INET, "192.168.1.1", 25565);
+
+	Data::User TestUser1;
+	TestUser1.Username = "hnefatl";
+	TestUser1.Password = "blahpass";
+	Data::User TestUser2;
+	TestUser2.Username = "test2";
+	TestUser2.Password = "blahpass";
+	Data::User TestUser3;
+	TestUser3.Username = "test3";
+	TestUser3.Password = "blahpass";
 
 	Data::Server TestServer;
 	TestServer.Name = "Seeeeerver test";
-	TestServer.Address = Net::Address(AF_INET, "192.168.1.1", 25565);
+	TestServer.Address = Address;
 
 	Data::Chatroom TestChatroom;
 	TestChatroom.Name = "Test chatroom";
 	TestChatroom.Description = "Blah blah test";
 	TestChatroom.OwnerUsername = "hnefatl";
-	TestChatroom.ServerAddress = Net::Address(AF_INET, "192.168.1.1", 25565);
+	TestChatroom.ServerAddress = Address;
 	TestChatroom.Password = "pass";
 
 	Data::Database d;
@@ -46,7 +56,7 @@ void DbTest()
 		std::cout << "Failed to open database." << std::endl;
 		return;
 	}
-	if (!d.InsertUser(TestUser))
+	if (!d.InsertUser(TestUser1) || !d.InsertUser(TestUser2) || !d.InsertUser(TestUser3))
 	{
 		std::cout << "Failed to insert User." << std::endl;
 		return;
@@ -62,16 +72,16 @@ void DbTest()
 		return;
 	}
 
-	TestUser = Data::User();
+	TestUser1 = Data::User();
 	TestServer = Data::Server();
 	TestChatroom = Data::Chatroom();
 
-	if (!d.GetUser("hnefatl", TestUser))
+	if (!d.GetUser("hnefatl", TestUser1))
 	{
 		std::cout << "Failed to read User." << std::endl;
 		return;
 	}
-	if (!d.GetServer(Net::Address(AF_INET, "192.168.1.1", 25565), TestServer))
+	if (!d.GetServer(Address, TestServer))
 	{
 		std::cout << "Failed to read Server." << std::endl;
 		return;

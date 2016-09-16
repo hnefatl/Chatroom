@@ -27,6 +27,7 @@ namespace Data
 		CORE_API bool BindNull(const std::string &Name);
 
 		CORE_API bool Execute();
+		CORE_API bool Step();
 		CORE_API bool Step(bool &MoreData);
 
 		CORE_API bool GetString(unsigned int Column, Nullable<std::string> &Out);
